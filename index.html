@@ -486,9 +486,11 @@ async function tryLogin() {
 document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
 
 function showApp() {
-  document.getElementById('login').classList.remove('active');
+  const login = document.getElementById('login');
+  if (login) login.remove();
   document.getElementById('formScreen').classList.add('active');
   document.getElementById('bottomNav').classList.add('visible');
+  document.body.style.paddingTop = '0';
   updateStorageBadge();
 }
 
