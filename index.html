@@ -33,15 +33,16 @@ input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
 /* === SCREENS === */
 .screen { display: none; padding: 20px; animation: fadeIn .3s ease; }
 .screen.active { display: block; }
-#login.active { display: flex; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* === LOGIN SCREEN === */
 #login {
-  flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   min-height: 100dvh; padding: 40px 24px; text-align: center;
   background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 50%, var(--purple) 100%);
+  position: fixed; inset: 0; z-index: 999;
 }
+#login.hidden { display: none !important; }
 #login .logo { font-size: 4rem; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.15)); }
 #login h1 { color: #fff; font-size: 1.8rem; margin-bottom: 4px; font-weight: 700; }
 #login .subtitle { color: rgba(255,255,255,.85); font-size: .95rem; margin-bottom: 32px; }
@@ -271,7 +272,7 @@ input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
 <body>
 
 <!-- ===== LOGIN SCREEN ===== -->
-<div id="login" class="screen active">
+<div id="login">
   <div class="logo">🦋</div>
   <h1>Maricota</h1>
   <div class="subtitle">Cadastro de Produtos</div>
@@ -486,11 +487,9 @@ async function tryLogin() {
 document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
 
 function showApp() {
-  const login = document.getElementById('login');
-  if (login) login.remove();
+  document.getElementById('login').classList.add('hidden');
   document.getElementById('formScreen').classList.add('active');
   document.getElementById('bottomNav').classList.add('visible');
-  document.body.style.paddingTop = '0';
   updateStorageBadge();
 }
 
