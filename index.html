@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#32e1c5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Maricota Cadastro</title>
+<link rel="manifest" href="./manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* === RESET & VARIABLES === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #32e1c5; --purple: #bf5cf8; --pink: #ff6fd9;
+  --orange: #ff884d; --yellow: #ffda42; --blue: #00bbf7;
+  --bg: #f8f9fa; --card: #ffffff; --text: #2d2d2d; --muted: #8e8e93;
+  --border: #e5e5ea; --danger: #ff3b30; --success: #34c759;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --font: 'Fredoka', sans-serif;
+}
+html { font-size: 16px; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  min-height: 100dvh; max-width: 480px; margin: 0 auto;
+  -webkit-font-smoothing: antialiased; padding-bottom: 80px;
+}
+h1, h2, h3 { font-weight: 600; }
+input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
+
+/* === SCREENS === */
+.screen { display: none; padding: 20px; animation: fadeIn .3s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* === LOGIN SCREEN === */
+#login {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100dvh; padding: 40px 24px; text-align: center;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 50%, var(--purple) 100%);
+}
+#login .logo { font-size: 4rem; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.15)); }
+#login h1 { color: #fff; font-size: 1.8rem; margin-bottom: 4px; font-weight: 700; }
+#login .subtitle { color: rgba(255,255,255,.85); font-size: .95rem; margin-bottom: 32px; }
+#login .input-group { width: 100%; max-width: 300px; position: relative; }
+#login input {
+  width: 100%; padding: 16px 20px; border: none; border-radius: 50px;
+  font-size: 1.05rem; background: rgba(255,255,255,.95); text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,.12); outline: none;
+}
+#login input::placeholder { color: var(--muted); }
+#login .btn-enter {
+  width: 100%; max-width: 300px; margin-top: 16px; padding: 16px;
+  border: none; border-radius: 50px; background: var(--orange);
+  color: #fff; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,136,77,.4); transition: transform .15s;
+}
+#login .btn-enter:active { transform: scale(.97); }
+#login .error { color: var(--yellow); margin-top: 12px; font-size: .9rem; display: none; }
+
+/* === HEADER === */
+.header {
+  display: flex; align-items: center; gap: 12px; padding: 16px 0; margin-bottom: 8px;
+}
+.header .logo-sm { font-size: 1.6rem; }
+.header h2 { font-size: 1.25rem; color: var(--text); }
+.header .storage-badge {
+  margin-left: auto; font-size: .75rem; padding: 4px 10px;
+  background: var(--border); border-radius: 50px; color: var(--muted);
+}
+
+/* === FORM === */
+.form-section { margin-bottom: 20px; }
+.form-section h3 {
+  font-size: .85rem; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--muted); margin-bottom: 10px; font-weight: 500;
+}
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: .9rem; font-weight: 500;
+  margin-bottom: 6px; color: var(--text);
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--card);
+  font-size: 1rem; transition: border-color .2s; outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--teal);
+}
+.field textarea { resize: vertical; min-height: 80px; }
+.field .hint { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+/* === PHOTO UPLOAD === */
+.photo-area {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 20px; text-align: center; background: var(--card);
+}
+.photo-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 12px; }
+.photo-btns button {
+  padding: 12px 20px; border: none; border-radius: 50px;
+  font-size: .9rem; font-weight: 500; cursor: pointer; transition: transform .15s;
+}
+.photo-btns button:active { transform: scale(.95); }
+.btn-camera { background: var(--teal); color: #fff; }
+.btn-gallery { background: var(--purple); color: #fff; }
+.photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.photo-thumb {
+  width: 72px; height: 72px; border-radius: 10px; overflow: hidden;
+  position: relative; box-shadow: var(--shadow);
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb .remove {
+  position: absolute; top: -4px; right: -4px; width: 22px; height: 22px;
+  background: var(--danger); color: #fff; border: 2px solid #fff;
+  border-radius: 50%; font-size: .7rem; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; line-height: 1;
+}
+
+/* === GENDER TOGGLES === */
+.gender-group { display: flex; gap: 8px; }
+.gender-btn {
+  flex: 1; padding: 12px 8px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--card);
+  text-align: center; font-size: .9rem; font-weight: 500;
+  cursor: pointer; transition: all .2s;
+}
+.gender-btn.active-f { border-color: var(--pink); background: #fff0f8; color: var(--pink); }
+.gender-btn.active-m { border-color: var(--blue); background: #f0f8ff; color: var(--blue); }
+.gender-btn.active-u { border-color: var(--purple); background: #f8f0ff; color: var(--purple); }
+
+/* === COLOR TAGS === */
+.color-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.color-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px; border-radius: 50px; font-size: .85rem;
+  background: var(--teal); color: #fff; font-weight: 500;
+}
+.color-tag .x { cursor: pointer; font-size: .75rem; opacity: .8; }
+
+/* === SIZE GRID === */
+.size-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.size-pill {
+  padding: 10px 14px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--card); font-size: .9rem; font-weight: 500;
+  cursor: pointer; transition: all .2s; min-width: 44px; text-align: center;
+}
+.size-pill.selected { border-color: var(--purple); background: #f3e8ff; color: var(--purple); }
+
+/* === TOGGLE SWITCH === */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; }
+.toggle {
+  width: 52px; height: 30px; border-radius: 15px; background: var(--border);
+  position: relative; cursor: pointer; transition: background .3s;
+}
+.toggle.on { background: var(--success); }
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 24px; height: 24px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.15); transition: transform .3s;
+}
+.toggle.on::after { transform: translateX(22px); }
+
+/* === PRICE INPUT === */
+.price-wrap {
+  display: flex; align-items: center; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--card); overflow: hidden;
+}
+.price-wrap:focus-within { border-color: var(--teal); }
+.price-prefix {
+  padding: 14px 12px; background: var(--bg); font-weight: 600;
+  color: var(--muted); border-right: 1px solid var(--border);
+}
+.price-wrap input {
+  border: none !important; padding: 14px 12px;
+  flex: 1; font-size: 1.1rem; font-weight: 600;
+}
+
+/* === SUBMIT BUTTON === */
+.btn-submit {
+  width: 100%; padding: 18px; border: none; border-radius: 50px;
+  background: linear-gradient(135deg, var(--teal), var(--blue));
+  color: #fff; font-size: 1.15rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(50,225,197,.35); margin-top: 16px;
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-submit:active { transform: scale(.97); box-shadow: 0 2px 10px rgba(50,225,197,.2); }
+
+/* === PRODUCT LIST === */
+.product-card {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  margin-bottom: 12px; box-shadow: var(--shadow); display: flex; gap: 14px;
+}
+.product-card .thumb {
+  width: 64px; height: 64px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+}
+.product-card .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.product-card .thumb .no-img { font-size: 1.5rem; }
+.product-card .info { flex: 1; min-width: 0; }
+.product-card .info h3 { font-size: 1rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.product-card .info .meta { font-size: .8rem; color: var(--muted); }
+.product-card .info .price { font-size: 1rem; font-weight: 600; color: var(--teal); margin-top: 4px; }
+.product-card .actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.btn-icon {
+  width: 38px; height: 38px; border: none; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; cursor: pointer; transition: transform .15s;
+}
+.btn-icon:active { transform: scale(.9); }
+.btn-export { background: #e8f5e9; color: var(--success); }
+.btn-delete { background: #fce4ec; color: var(--danger); }
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--muted);
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+/* === BOTTOM NAV === */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; background: var(--card);
+  border-top: 1px solid var(--border); display: none; z-index: 100;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+}
+.bottom-nav.visible { display: flex; }
+.nav-item {
+  flex: 1; padding: 10px 0 12px; text-align: center; cursor: pointer;
+  color: var(--muted); transition: color .2s; border: none; background: none;
+  font-family: var(--font);
+}
+.nav-item .icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
+.nav-item .label { font-size: .72rem; font-weight: 500; }
+.nav-item.active { color: var(--teal); }
+
+/* === TOAST === */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  padding: 14px 24px; border-radius: 50px; background: var(--text);
+  color: #fff; font-size: .9rem; font-weight: 500; z-index: 200;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2); opacity: 0; transition: opacity .3s;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* === MODAL === */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border-radius: 20px 20px 0 0; padding: 24px;
+  width: 100%; max-width: 480px; animation: slideUp .3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal h3 { margin-bottom: 12px; }
+.modal p { color: var(--muted); margin-bottom: 20px; font-size: .95rem; }
+.modal .btns { display: flex; gap: 10px; }
+.modal .btns button {
+  flex: 1; padding: 14px; border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+}
+.btn-cancel { background: var(--bg); color: var(--text); }
+.btn-confirm-delete { background: var(--danger); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="login" class="screen active">
+  <div class="logo">🦋</div>
+  <h1>Maricota</h1>
+  <div class="subtitle">Cadastro de Produtos</div>
+  <div class="input-group">
+    <input type="password" id="pw" placeholder="Digite a senha" autocomplete="off">
+  </div>
+  <button class="btn-enter" onclick="tryLogin()">Entrar</button>
+  <div class="error" id="loginError">Senha incorreta. Tente novamente.</div>
+</div>
+
+<!-- ===== FORM SCREEN ===== -->
+<div id="formScreen" class="screen">
+  <div class="header">
+    <span class="logo-sm">🦋</span>
+    <h2>Novo Produto</h2>
+    <span class="storage-badge" id="storageBadge"></span>
+  </div>
+
+  <form id="productForm" onsubmit="return saveProduct(event)">
+    <!-- Photos -->
+    <div class="form-section">
+      <h3>📸 Fotos do Produto</h3>
+      <div class="photo-area">
+        <div class="photo-btns">
+          <button type="button" class="btn-camera" onclick="takePhoto('camera')">📷 Tirar Foto</button>
+          <button type="button" class="btn-gallery" onclick="takePhoto('gallery')">🖼️ Galeria</button>
+        </div>
+        <div class="hint">Até 5 fotos (a primeira será a principal)</div>
+        <div class="photo-preview" id="photoPreview"></div>
+      </div>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" multiple hidden>
+      <input type="file" id="galleryInput" accept="image/*" multiple hidden>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="form-section">
+      <h3>👕 Dados da Peça</h3>
+
+      <div class="field">
+        <label>Nome do produto</label>
+        <input type="text" id="fName" placeholder="Ex: Vestido Borboletas" required>
+      </div>
+
+      <div class="field">
+        <label>Tipo de peça</label>
+        <select id="fType" required>
+          <option value="">Selecione...</option>
+          <option>Vestido</option><option>Conjunto</option>
+          <option>Camiseta</option><option>Body</option>
+          <option>Macacão</option><option>Short</option>
+          <option>Calça</option><option>Saia</option>
+          <option>Casaco</option><option>Acessório</option>
+          <option>Meias</option><option>Íntimos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Faixa etária</label>
+        <select id="fAge" required>
+          <option value="">Selecione...</option>
+          <option>0-1 ano</option><option>1-3 anos</option>
+          <option>4-6 anos</option><option>7-12 anos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Gênero</label>
+        <div class="gender-group">
+          <div class="gender-btn" onclick="setGender(this,'Menina','active-f')">👧 Menina</div>
+          <div class="gender-btn" onclick="setGender(this,'Menino','active-m')">👦 Menino</div>
+          <div class="gender-btn" onclick="setGender(this,'Unissex','active-u')">🧒 Unissex</div>
+        </div>
+        <input type="hidden" id="fGender" required>
+      </div>
+
+      <div class="field">
+        <label>Cor(es)</label>
+        <input type="text" id="fColorInput" placeholder="Digite e pressione Enter">
+        <div class="color-tags" id="colorTags"></div>
+      </div>
+
+      <div class="field">
+        <label>Tamanhos disponíveis</label>
+        <div class="size-grid" id="sizeGrid"></div>
+      </div>
+
+      <div class="field">
+        <label>Material / Composição</label>
+        <input type="text" id="fMaterial" placeholder="Ex: 100% algodão">
+      </div>
+    </div>
+
+    <!-- Pricing & Catalog -->
+    <div class="form-section">
+      <h3>💰 Preço e Catálogo</h3>
+
+      <div class="field">
+        <label>Preço de venda</label>
+        <div class="price-wrap">
+          <span class="price-prefix">R$</span>
+          <input type="text" id="fPrice" inputmode="decimal" placeholder="0,00" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Marca</label>
+        <input type="text" id="fBrand" value="Maricota">
+      </div>
+
+      <div class="field">
+        <label>Código SKU</label>
+        <input type="text" id="fSku" placeholder="Ex: MRC-VEST-BORB-001">
+      </div>
+
+      <div class="field">
+        <label>Categoria no Nuvemshop</label>
+        <input type="text" id="fCategory" list="catSuggestions" placeholder="Ex: Infantil > Meninas > Vestidos">
+        <datalist id="catSuggestions">
+          <option value="Infantil > Meninas > Vestidos">
+          <option value="Infantil > Meninas > Conjuntos">
+          <option value="Infantil > Meninas > Saias">
+          <option value="Infantil > Meninos > Conjuntos">
+          <option value="Infantil > Meninos > Camisetas">
+          <option value="Infantil > Meninos > Shorts">
+          <option value="Bebê > Meninas > Bodies">
+          <option value="Bebê > Meninas > Macacões">
+          <option value="Bebê > Meninos > Bodies">
+          <option value="Bebê > Meninos > Macacões">
+          <option value="Bebê > Unissex">
+          <option value="Acessórios">
+          <option value="Meias e Íntimos">
+        </datalist>
+      </div>
+
+      <div class="field">
+        <div class="toggle-row">
+          <label>Produto destaque?</label>
+          <div class="toggle" id="fFeatured" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-section">
+      <h3>📝 Observações</h3>
+      <div class="field">
+        <textarea id="fNotes" placeholder="Detalhes especiais: estampa exclusiva, coleção temática, etc."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">✅ Salvar Produto</button>
+  </form>
+</div>
+
+<!-- ===== LIST SCREEN ===== -->
+<div id="listScreen" class="screen">
+  <div class="header">
+    <span class="logo-sm">🦋</span>
+    <h2>Produtos Salvos</h2>
+  </div>
+  <div id="productList"></div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item active" onclick="showScreen('formScreen')">
+    <span class="icon">➕</span><span class="label">Novo</span>
+  </button>
+  <button class="nav-item" onclick="showScreen('listScreen')">
+    <span class="icon">📦</span><span class="label">Salvos</span>
+  </button>
+</nav>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== DELETE MODAL ===== -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Excluir produto?</h3>
+    <p>Essa ação não pode ser desfeita.</p>
+    <div class="btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm-delete" id="confirmDeleteBtn">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================
+   PASSWORD GATE
+   ============================ */
+const PW_HASH = '8e1875b78026c5f4b68cbe5899bfaad477afc6e20bb84cb2879956b79a844913';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function tryLogin() {
+  const pw = document.getElementById('pw').value;
+  const hash = await sha256(pw);
+  if (hash === PW_HASH) {
+    sessionStorage.setItem('auth', '1');
+    showApp();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('pw').value = '';
+  }
+}
+
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+function showApp() {
+  document.getElementById('login').classList.remove('active');
+  document.getElementById('formScreen').classList.add('active');
+  document.getElementById('bottomNav').classList.add('visible');
+  updateStorageBadge();
+}
+
+// Auto-login if session active
+if (sessionStorage.getItem('auth')) showApp();
+
+/* ============================
+   SCREEN NAVIGATION
+   ============================ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((n, i) => {
+    n.classList.toggle('active', (i === 0 && id === 'formScreen') || (i === 1 && id === 'listScreen'));
+  });
+  if (id === 'listScreen') renderList();
+}
+
+/* ============================
+   PHOTO HANDLING
+   ============================ */
+let photos = [];
+
+function takePhoto(mode) {
+  if (photos.length >= 5) { toast('Máximo de 5 fotos atingido'); return; }
+  const input = document.getElementById(mode === 'camera' ? 'cameraInput' : 'galleryInput');
+  input.click();
+}
+
+document.getElementById('cameraInput').addEventListener('change', handlePhotos);
+document.getElementById('galleryInput').addEventListener('change', handlePhotos);
+
+function handlePhotos(e) {
+  const files = Array.from(e.target.files);
+  files.slice(0, 5 - photos.length).forEach(file => {
+    compressImage(file, (dataUrl) => {
+      photos.push(dataUrl);
+      renderPhotos();
+    });
+  });
+  e.target.value = '';
+}
+
+function compressImage(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxW = 800;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = (maxW / w) * h; w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.65));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPhotos() {
+  const el = document.getElementById('photoPreview');
+  el.innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p}" alt="Foto ${i + 1}">
+      <div class="remove" onclick="removePhoto(${i})">✕</div>
+    </div>
+  `).join('');
+}
+
+function removePhoto(i) { photos.splice(i, 1); renderPhotos(); }
+
+/* ============================
+   GENDER TOGGLES
+   ============================ */
+function setGender(el, val, cls) {
+  document.querySelectorAll('.gender-btn').forEach(b => b.className = 'gender-btn');
+  el.classList.add(cls);
+  document.getElementById('fGender').value = val;
+}
+
+/* ============================
+   COLOR TAGS
+   ============================ */
+let colors = [];
+const colorInput = document.getElementById('fColorInput');
+colorInput.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ',') && colorInput.value.trim()) {
+    e.preventDefault();
+    const c = colorInput.value.trim().replace(',', '');
+    if (c && !colors.includes(c)) { colors.push(c); renderColors(); }
+    colorInput.value = '';
+  }
+});
+
+function renderColors() {
+  document.getElementById('colorTags').innerHTML = colors.map((c, i) => `
+    <span class="color-tag">${c} <span class="x" onclick="removeColor(${i})">✕</span></span>
+  `).join('');
+}
+
+function removeColor(i) { colors.splice(i, 1); renderColors(); }
+
+/* ============================
+   SIZE GRID
+   ============================ */
+const SIZES = ['RN', 'P', 'M', 'G', '1', '2', '3', '4', '5', '6', '8', '10', '12'];
+let selectedSizes = [];
+
+const sizeGrid = document.getElementById('sizeGrid');
+sizeGrid.innerHTML = SIZES.map(s => `<div class="size-pill" onclick="toggleSize(this,'${s}')">${s}</div>`).join('');
+
+function toggleSize(el, size) {
+  el.classList.toggle('selected');
+  if (selectedSizes.includes(size)) selectedSizes = selectedSizes.filter(s => s !== size);
+  else selectedSizes.push(size);
+}
+
+/* ============================
+   SAVE PRODUCT
+   ============================ */
+function saveProduct(e) {
+  e.preventDefault();
+  if (!document.getElementById('fGender').value) { toast('Selecione o gênero'); return false; }
+
+  const product = {
+    id: 'prod_' + Date.now(),
+    createdAt: new Date().toISOString(),
+    photos: photos,
+    name: document.getElementById('fName').value,
+    type: document.getElementById('fType').value,
+    ageRange: document.getElementById('fAge').value,
+    gender: document.getElementById('fGender').value,
+    colors: [...colors],
+    sizes: [...selectedSizes],
+    material: document.getElementById('fMaterial').value,
+    price: document.getElementById('fPrice').value,
+    brand: document.getElementById('fBrand').value,
+    sku: document.getElementById('fSku').value,
+    category: document.getElementById('fCategory').value,
+    featured: document.getElementById('fFeatured').classList.contains('on'),
+    notes: document.getElementById('fNotes').value,
+  };
+
+  const products = JSON.parse(localStorage.getItem('maricota_products') || '[]');
+  products.unshift(product);
+  localStorage.setItem('maricota_products', JSON.stringify(products));
+
+  resetForm();
+  toast('Produto salvo com sucesso! ✅');
+  updateStorageBadge();
+  return false;
+}
+
+function resetForm() {
+  document.getElementById('productForm').reset();
+  photos = []; colors = []; selectedSizes = [];
+  renderPhotos(); renderColors();
+  document.querySelectorAll('.gender-btn').forEach(b => b.className = 'gender-btn');
+  document.querySelectorAll('.size-pill').forEach(b => b.classList.remove('selected'));
+  document.getElementById('fFeatured').classList.remove('on');
+  document.getElementById('fGender').value = '';
+  document.getElementById('fBrand').value = 'Maricota';
+}
+
+/* ============================
+   PRODUCT LIST
+   ============================ */
+function renderList() {
+  const products = JSON.parse(localStorage.getItem('maricota_products') || '[]');
+  const el = document.getElementById('productList');
+
+  if (!products.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Nenhum produto cadastrado ainda.<br>Toque em "Novo" para começar!</p></div>';
+    return;
+  }
+
+  el.innerHTML = products.map(p => `
+    <div class="product-card">
+      <div class="thumb">
+        ${p.photos.length ? `<img src="${p.photos[0]}" alt="${p.name}">` : '<span class="no-img">📷</span>'}
+      </div>
+      <div class="info">
+        <h3>${p.name}</h3>
+        <div class="meta">${p.type} · ${p.gender} · ${p.ageRange}</div>
+        <div class="price">R$ ${p.price}</div>
+      </div>
+      <div class="actions">
+        <button class="btn-icon btn-export" onclick="exportMD('${p.id}')" title="Exportar">📄</button>
+        <button class="btn-icon btn-delete" onclick="confirmDelete('${p.id}')" title="Excluir">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================
+   EXPORT MARKDOWN
+   ============================ */
+function exportMD(id) {
+  const products = JSON.parse(localStorage.getItem('maricota_products') || '[]');
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  const md = `# Product Input — ${p.name}
+
+## 1. Foto do Produto
+${p.photos.length} foto(s) anexada(s) ao cadastro.
+
+## 2. Dados Básicos
+**Tipo de peça:** ${p.type}
+**Faixa etária:** ${p.ageRange}
+**Gênero:** ${p.gender}
+**Cor(es) disponíveis:** ${p.colors.join(', ') || 'Não informado'}
+**Tamanhos disponíveis:** ${p.sizes.join(', ') || 'Não informado'}
+**Material/composição do tecido:** ${p.material || 'Não informado'}
+**Preço de venda (R$):** ${p.price}
+
+## 3. Dados de Catálogo
+**Marca:** ${p.brand}
+**Código SKU:** ${p.sku || 'Não informado'}
+**Categoria no Nuvemshop:** ${p.category || 'Não informado'}
+**É produto destaque?** ${p.featured ? 'Sim' : 'Não'}
+
+## 4. Observações
+${p.notes || 'Nenhuma observação.'}
+`;
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `product-input-${p.sku || p.id}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Arquivo exportado! 📄');
+}
+
+/* ============================
+   DELETE
+   ============================ */
+let deleteTarget = null;
+
+function confirmDelete(id) {
+  deleteTarget = id;
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('deleteModal').classList.remove('show');
+  deleteTarget = null;
+}
+
+document.getElementById('confirmDeleteBtn').onclick = () => {
+  if (!deleteTarget) return;
+  let products = JSON.parse(localStorage.getItem('maricota_products') || '[]');
+  products = products.filter(p => p.id !== deleteTarget);
+  localStorage.setItem('maricota_products', JSON.stringify(products));
+  closeModal();
+  renderList();
+  updateStorageBadge();
+  toast('Produto excluído');
+};
+
+/* ============================
+   STORAGE BADGE
+   ============================ */
+function updateStorageBadge() {
+  const used = new Blob([localStorage.getItem('maricota_products') || '']).size;
+  const kb = Math.round(used / 1024);
+  const badge = document.getElementById('storageBadge');
+  if (badge) badge.textContent = kb > 0 ? `${kb} KB` : '';
+}
+
+/* ============================
+   TOAST
+   ============================ */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+/* ============================
+   SERVICE WORKER
+   ============================ */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

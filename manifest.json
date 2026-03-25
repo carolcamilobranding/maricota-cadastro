@@ -1,0 +1,17 @@
+{
+  "name": "Maricota Cadastro",
+  "short_name": "Cadastro",
+  "description": "Cadastro de produtos — Maricota Store Infantil",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#32e1c5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%2332e1c5'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='280' font-family='sans-serif'%3E🦋%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
