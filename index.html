@@ -9,6 +9,7 @@
 <title>Maricota Cadastro</title>
 <link rel="manifest" href="./manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 /* === RESET & VARIABLES === */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -94,6 +95,44 @@ input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
 }
 .field textarea { resize: vertical; min-height: 80px; }
 .field .hint { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+/* === BARCODE SCANNER === */
+.btn-scan {
+  width: 100%; padding: 18px; border: none; border-radius: 50px;
+  background: linear-gradient(135deg, var(--purple), var(--orange));
+  color: #fff; font-size: 1.15rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(191,92,248,.35); margin-bottom: 12px;
+  transition: transform .15s; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-scan:active { transform: scale(.97); }
+.btn-scan-manual {
+  width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 50px;
+  background: var(--card); color: var(--muted); font-size: .9rem; font-weight: 500;
+  cursor: pointer; margin-bottom: 12px;
+}
+#scannerContainer { border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; display: none; }
+#scannerContainer.active { display: block; }
+.btn-stop-scan {
+  width: 100%; padding: 12px; border: none; border-radius: 50px;
+  background: var(--danger); color: #fff; font-size: .95rem; font-weight: 600;
+  cursor: pointer; margin-bottom: 12px; display: none;
+}
+.btn-stop-scan.active { display: block; }
+.barcode-result {
+  display: none; align-items: center; gap: 10px; padding: 14px 16px;
+  background: #e8f8f0; border: 2px solid var(--success); border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+.barcode-result.active { display: flex; }
+.barcode-result .checkmark {
+  width: 28px; height: 28px; background: var(--success); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; flex-shrink: 0;
+}
+.barcode-result .barcode-value { font-size: 1.1rem; font-weight: 600; color: var(--text); flex: 1; }
+.barcode-result .barcode-clear { background: none; border: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; }
+.manual-barcode-field { display: none; margin-bottom: 12px; }
+.manual-barcode-field.active { display: block; }
+.product-card .info .barcode-meta { font-size: .75rem; color: var(--purple); font-weight: 500; }
 
 /* === PHOTO UPLOAD === */
 .photo-area {
@@ -292,6 +331,28 @@ input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
   </div>
 
   <form id="productForm" onsubmit="return saveProduct(event)">
+    <!-- Barcode Scanner -->
+    <div class="form-section">
+      <h3>📊 Código de Barras</h3>
+      <button type="button" class="btn-scan" id="btnScan" onclick="startScanner()">
+        <span>📷</span> <span>Escanear Código de Barras</span>
+      </button>
+      <button type="button" class="btn-stop-scan" id="btnStopScan" onclick="stopScanner()">Parar Scanner</button>
+      <div id="scannerContainer"></div>
+      <div class="barcode-result" id="barcodeResult">
+        <div class="checkmark">✓</div>
+        <div class="barcode-value" id="barcodeValue"></div>
+        <button type="button" class="barcode-clear" onclick="clearBarcode()">✕</button>
+      </div>
+      <button type="button" class="btn-scan-manual" id="btnManual" onclick="toggleManualBarcode()">Digitar manualmente</button>
+      <div class="manual-barcode-field" id="manualBarcodeField">
+        <div class="field">
+          <input type="text" id="fBarcodeManual" placeholder="Digite o código de barras" inputmode="numeric" oninput="onManualBarcodeInput(this)">
+        </div>
+      </div>
+      <input type="hidden" id="fBarcode">
+    </div>
+
     <!-- Photos -->
     <div class="form-section">
       <h3>📸 Fotos do Produto</h3>
@@ -509,6 +570,87 @@ function showScreen(id) {
 }
 
 /* ============================
+   BARCODE SCANNER
+   ============================ */
+let html5QrCode = null;
+let scannerRunning = false;
+
+function startScanner() {
+  if (scannerRunning) return;
+  const container = document.getElementById('scannerContainer');
+  container.classList.add('active');
+  document.getElementById('btnStopScan').classList.add('active');
+  document.getElementById('btnScan').style.display = 'none';
+  html5QrCode = new Html5Qrcode('scannerContainer');
+  const config = {
+    fps: 10, qrbox: { width: 280, height: 100 },
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128
+    ]
+  };
+  html5QrCode.start({ facingMode: 'environment' }, config,
+    (decodedText) => { onBarcodeScanned(decodedText); stopScanner(); },
+    () => {}
+  ).catch(() => { toast('Erro ao acessar a câmera'); stopScanner(); });
+  scannerRunning = true;
+}
+
+function stopScanner() {
+  if (html5QrCode && scannerRunning) {
+    html5QrCode.stop().then(() => { html5QrCode.clear(); resetScannerUI(); }).catch(() => { resetScannerUI(); });
+  } else { resetScannerUI(); }
+}
+
+function resetScannerUI() {
+  scannerRunning = false;
+  document.getElementById('scannerContainer').classList.remove('active');
+  document.getElementById('btnStopScan').classList.remove('active');
+  document.getElementById('btnScan').style.display = '';
+}
+
+function onBarcodeScanned(code) {
+  document.getElementById('fBarcode').value = code;
+  document.getElementById('barcodeValue').textContent = code;
+  document.getElementById('barcodeResult').classList.add('active');
+  document.getElementById('btnScan').style.display = 'none';
+  document.getElementById('btnManual').style.display = 'none';
+  document.getElementById('manualBarcodeField').classList.remove('active');
+  toast('Código detectado! ✅');
+}
+
+function clearBarcode() {
+  document.getElementById('fBarcode').value = '';
+  document.getElementById('barcodeValue').textContent = '';
+  document.getElementById('barcodeResult').classList.remove('active');
+  document.getElementById('btnScan').style.display = '';
+  document.getElementById('btnManual').style.display = '';
+  document.getElementById('fBarcodeManual').value = '';
+}
+
+function toggleManualBarcode() {
+  const field = document.getElementById('manualBarcodeField');
+  field.classList.toggle('active');
+  if (field.classList.contains('active')) document.getElementById('fBarcodeManual').focus();
+}
+
+function onManualBarcodeInput(input) {
+  const val = input.value.trim();
+  document.getElementById('fBarcode').value = val;
+  if (val.length >= 8) {
+    document.getElementById('barcodeValue').textContent = val;
+    document.getElementById('barcodeResult').classList.add('active');
+    document.getElementById('btnScan').style.display = 'none';
+    document.getElementById('btnManual').style.display = 'none';
+  } else {
+    document.getElementById('barcodeResult').classList.remove('active');
+    document.getElementById('btnScan').style.display = '';
+    document.getElementById('btnManual').style.display = '';
+  }
+}
+
+/* ============================
    PHOTO HANDLING
    ============================ */
 let photos = [];
@@ -619,6 +761,7 @@ function saveProduct(e) {
   const product = {
     id: 'prod_' + Date.now(),
     createdAt: new Date().toISOString(),
+    barcode: document.getElementById('fBarcode').value || '',
     photos: photos,
     name: document.getElementById('fName').value,
     type: document.getElementById('fType').value,
@@ -654,6 +797,8 @@ function resetForm() {
   document.getElementById('fFeatured').classList.remove('on');
   document.getElementById('fGender').value = '';
   document.getElementById('fBrand').value = 'Maricota';
+  clearBarcode();
+  if (scannerRunning) stopScanner();
 }
 
 /* ============================
@@ -676,6 +821,7 @@ function renderList() {
       <div class="info">
         <h3>${p.name}</h3>
         <div class="meta">${p.type} · ${p.gender} · ${p.ageRange}</div>
+        ${p.barcode ? `<div class="barcode-meta">📊 ${p.barcode}</div>` : ''}
         <div class="price">R$ ${p.price}</div>
       </div>
       <div class="actions">
@@ -696,10 +842,13 @@ function exportMD(id) {
 
   const md = `# Product Input — ${p.name}
 
-## 1. Foto do Produto
+## 1. Código de Barras
+${p.barcode || 'Não informado'}
+
+## 2. Foto do Produto
 ${p.photos.length} foto(s) anexada(s) ao cadastro.
 
-## 2. Dados Básicos
+## 3. Dados Básicos
 **Tipo de peça:** ${p.type}
 **Faixa etária:** ${p.ageRange}
 **Gênero:** ${p.gender}
@@ -708,13 +857,13 @@ ${p.photos.length} foto(s) anexada(s) ao cadastro.
 **Material/composição do tecido:** ${p.material || 'Não informado'}
 **Preço de venda (R$):** ${p.price}
 
-## 3. Dados de Catálogo
+## 4. Dados de Catálogo
 **Marca:** ${p.brand}
 **Código SKU:** ${p.sku || 'Não informado'}
 **Categoria no Nuvemshop:** ${p.category || 'Não informado'}
 **É produto destaque?** ${p.featured ? 'Sim' : 'Não'}
 
-## 4. Observações
+## 5. Observações
 ${p.notes || 'Nenhuma observação.'}
 `;
 
