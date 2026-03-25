@@ -355,132 +355,42 @@ input, select, textarea, button { font-family: var(--font); font-size: 1rem; }
 
     <!-- Photos -->
     <div class="form-section">
-      <h3>📸 Fotos do Produto</h3>
+      <h3>📸 Foto do Produto</h3>
       <div class="photo-area">
         <div class="photo-btns">
           <button type="button" class="btn-camera" onclick="takePhoto('camera')">📷 Tirar Foto</button>
           <button type="button" class="btn-gallery" onclick="takePhoto('gallery')">🖼️ Galeria</button>
         </div>
-        <div class="hint">Até 5 fotos (a primeira será a principal)</div>
+        <div class="hint">Tire a foto da etiqueta ou da peça na arara</div>
         <div class="photo-preview" id="photoPreview"></div>
       </div>
       <input type="file" id="cameraInput" accept="image/*" capture="environment" multiple hidden>
       <input type="file" id="galleryInput" accept="image/*" multiple hidden>
     </div>
 
-    <!-- Basic Info -->
+    <!-- Material -->
     <div class="form-section">
-      <h3>👕 Dados da Peça</h3>
-
+      <h3>🧵 Material</h3>
       <div class="field">
-        <label>Nome do produto</label>
-        <input type="text" id="fName" placeholder="Ex: Vestido Borboletas" required>
-      </div>
-
-      <div class="field">
-        <label>Tipo de peça</label>
-        <select id="fType" required>
+        <label>Composição do tecido (ver etiqueta)</label>
+        <select id="fMaterial">
           <option value="">Selecione...</option>
-          <option>Vestido</option><option>Conjunto</option>
-          <option>Camiseta</option><option>Body</option>
-          <option>Macacão</option><option>Short</option>
-          <option>Calça</option><option>Saia</option>
-          <option>Casaco</option><option>Acessório</option>
-          <option>Meias</option><option>Íntimos</option>
+          <option>100% Algodão</option>
+          <option>100% Poliéster</option>
+          <option>95% Algodão, 5% Elastano</option>
+          <option>90% Algodão, 10% Poliéster</option>
+          <option>80% Algodão, 20% Poliéster</option>
+          <option>67% Poliéster, 33% Algodão</option>
+          <option>100% Viscose</option>
+          <option>Moletom (80% Algodão, 20% Poliéster)</option>
+          <option>Jeans (98% Algodão, 2% Elastano)</option>
+          <option>Plush (100% Poliéster)</option>
+          <option>Ribana (95% Algodão, 5% Elastano)</option>
+          <option>Meia Malha (100% Algodão)</option>
+          <option>Suedine (100% Algodão)</option>
         </select>
-      </div>
-
-      <div class="field">
-        <label>Faixa etária</label>
-        <select id="fAge" required>
-          <option value="">Selecione...</option>
-          <option>0-1 ano</option><option>1-3 anos</option>
-          <option>4-6 anos</option><option>7-12 anos</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Gênero</label>
-        <div class="gender-group">
-          <div class="gender-btn" onclick="setGender(this,'Menina','active-f')">👧 Menina</div>
-          <div class="gender-btn" onclick="setGender(this,'Menino','active-m')">👦 Menino</div>
-          <div class="gender-btn" onclick="setGender(this,'Unissex','active-u')">🧒 Unissex</div>
-        </div>
-        <input type="hidden" id="fGender" required>
-      </div>
-
-      <div class="field">
-        <label>Cor(es)</label>
-        <input type="text" id="fColorInput" placeholder="Digite e pressione Enter">
-        <div class="color-tags" id="colorTags"></div>
-      </div>
-
-      <div class="field">
-        <label>Tamanhos disponíveis</label>
-        <div class="size-grid" id="sizeGrid"></div>
-      </div>
-
-      <div class="field">
-        <label>Material / Composição</label>
-        <input type="text" id="fMaterial" placeholder="Ex: 100% algodão">
-      </div>
-    </div>
-
-    <!-- Pricing & Catalog -->
-    <div class="form-section">
-      <h3>💰 Preço e Catálogo</h3>
-
-      <div class="field">
-        <label>Preço de venda</label>
-        <div class="price-wrap">
-          <span class="price-prefix">R$</span>
-          <input type="text" id="fPrice" inputmode="decimal" placeholder="0,00" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Marca</label>
-        <input type="text" id="fBrand" value="Maricota">
-      </div>
-
-      <div class="field">
-        <label>Código SKU</label>
-        <input type="text" id="fSku" placeholder="Ex: MRC-VEST-BORB-001">
-      </div>
-
-      <div class="field">
-        <label>Categoria no Nuvemshop</label>
-        <input type="text" id="fCategory" list="catSuggestions" placeholder="Ex: Infantil > Meninas > Vestidos">
-        <datalist id="catSuggestions">
-          <option value="Infantil > Meninas > Vestidos">
-          <option value="Infantil > Meninas > Conjuntos">
-          <option value="Infantil > Meninas > Saias">
-          <option value="Infantil > Meninos > Conjuntos">
-          <option value="Infantil > Meninos > Camisetas">
-          <option value="Infantil > Meninos > Shorts">
-          <option value="Bebê > Meninas > Bodies">
-          <option value="Bebê > Meninas > Macacões">
-          <option value="Bebê > Meninos > Bodies">
-          <option value="Bebê > Meninos > Macacões">
-          <option value="Bebê > Unissex">
-          <option value="Acessórios">
-          <option value="Meias e Íntimos">
-        </datalist>
-      </div>
-
-      <div class="field">
-        <div class="toggle-row">
-          <label>Produto destaque?</label>
-          <div class="toggle" id="fFeatured" onclick="this.classList.toggle('on')"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="form-section">
-      <h3>📝 Observações</h3>
-      <div class="field">
-        <textarea id="fNotes" placeholder="Detalhes especiais: estampa exclusiva, coleção temática, etc."></textarea>
+        <div class="hint">Ou digite abaixo se não encontrar na lista</div>
+        <input type="text" id="fMaterialCustom" placeholder="Ex: 60% Algodão, 40% Poliéster" style="margin-top: 8px;">
       </div>
     </div>
 
@@ -706,76 +616,22 @@ function renderPhotos() {
 function removePhoto(i) { photos.splice(i, 1); renderPhotos(); }
 
 /* ============================
-   GENDER TOGGLES
-   ============================ */
-function setGender(el, val, cls) {
-  document.querySelectorAll('.gender-btn').forEach(b => b.className = 'gender-btn');
-  el.classList.add(cls);
-  document.getElementById('fGender').value = val;
-}
-
-/* ============================
-   COLOR TAGS
-   ============================ */
-let colors = [];
-const colorInput = document.getElementById('fColorInput');
-colorInput.addEventListener('keydown', e => {
-  if ((e.key === 'Enter' || e.key === ',') && colorInput.value.trim()) {
-    e.preventDefault();
-    const c = colorInput.value.trim().replace(',', '');
-    if (c && !colors.includes(c)) { colors.push(c); renderColors(); }
-    colorInput.value = '';
-  }
-});
-
-function renderColors() {
-  document.getElementById('colorTags').innerHTML = colors.map((c, i) => `
-    <span class="color-tag">${c} <span class="x" onclick="removeColor(${i})">✕</span></span>
-  `).join('');
-}
-
-function removeColor(i) { colors.splice(i, 1); renderColors(); }
-
-/* ============================
-   SIZE GRID
-   ============================ */
-const SIZES = ['RN', 'P', 'M', 'G', '1', '2', '3', '4', '5', '6', '8', '10', '12'];
-let selectedSizes = [];
-
-const sizeGrid = document.getElementById('sizeGrid');
-sizeGrid.innerHTML = SIZES.map(s => `<div class="size-pill" onclick="toggleSize(this,'${s}')">${s}</div>`).join('');
-
-function toggleSize(el, size) {
-  el.classList.toggle('selected');
-  if (selectedSizes.includes(size)) selectedSizes = selectedSizes.filter(s => s !== size);
-  else selectedSizes.push(size);
-}
-
-/* ============================
    SAVE PRODUCT
    ============================ */
 function saveProduct(e) {
   e.preventDefault();
-  if (!document.getElementById('fGender').value) { toast('Selecione o gênero'); return false; }
+  const barcode = document.getElementById('fBarcode').value;
+  if (!barcode) { toast('Escaneie ou digite o código de barras'); return false; }
+  if (!photos.length) { toast('Tire pelo menos uma foto'); return false; }
+
+  const material = document.getElementById('fMaterialCustom').value || document.getElementById('fMaterial').value;
 
   const product = {
     id: 'prod_' + Date.now(),
     createdAt: new Date().toISOString(),
-    barcode: document.getElementById('fBarcode').value || '',
+    barcode: barcode,
     photos: photos,
-    name: document.getElementById('fName').value,
-    type: document.getElementById('fType').value,
-    ageRange: document.getElementById('fAge').value,
-    gender: document.getElementById('fGender').value,
-    colors: [...colors],
-    sizes: [...selectedSizes],
-    material: document.getElementById('fMaterial').value,
-    price: document.getElementById('fPrice').value,
-    brand: document.getElementById('fBrand').value,
-    sku: document.getElementById('fSku').value,
-    category: document.getElementById('fCategory').value,
-    featured: document.getElementById('fFeatured').classList.contains('on'),
-    notes: document.getElementById('fNotes').value,
+    material: material,
   };
 
   const products = JSON.parse(localStorage.getItem('maricota_products') || '[]');
@@ -783,20 +639,16 @@ function saveProduct(e) {
   localStorage.setItem('maricota_products', JSON.stringify(products));
 
   resetForm();
-  toast('Produto salvo com sucesso! ✅');
+  toast('Produto salvo! O squad vai processar automaticamente ✅');
   updateStorageBadge();
   return false;
 }
 
 function resetForm() {
   document.getElementById('productForm').reset();
-  photos = []; colors = []; selectedSizes = [];
-  renderPhotos(); renderColors();
-  document.querySelectorAll('.gender-btn').forEach(b => b.className = 'gender-btn');
-  document.querySelectorAll('.size-pill').forEach(b => b.classList.remove('selected'));
-  document.getElementById('fFeatured').classList.remove('on');
-  document.getElementById('fGender').value = '';
-  document.getElementById('fBrand').value = 'Maricota';
+  photos = [];
+  renderPhotos();
+  document.getElementById('fMaterialCustom').value = '';
   clearBarcode();
   if (scannerRunning) stopScanner();
 }
@@ -816,16 +668,15 @@ function renderList() {
   el.innerHTML = products.map(p => `
     <div class="product-card">
       <div class="thumb">
-        ${p.photos.length ? `<img src="${p.photos[0]}" alt="${p.name}">` : '<span class="no-img">📷</span>'}
+        ${p.photos && p.photos.length ? `<img src="${p.photos[0]}" alt="Produto">` : '<span class="no-img">📷</span>'}
       </div>
       <div class="info">
-        <h3>${p.name}</h3>
-        <div class="meta">${p.type} · ${p.gender} · ${p.ageRange}</div>
-        ${p.barcode ? `<div class="barcode-meta">📊 ${p.barcode}</div>` : ''}
-        <div class="price">R$ ${p.price}</div>
+        <h3>${p.barcode || 'Sem código'}</h3>
+        <div class="barcode-meta">📊 ${p.barcode || '-'}</div>
+        <div class="meta">${p.material || 'Material não informado'}</div>
+        <div class="meta">${p.photos ? p.photos.length : 0} foto(s) · ${new Date(p.createdAt).toLocaleString('pt-BR', {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}</div>
       </div>
       <div class="actions">
-        <button class="btn-icon btn-export" onclick="exportMD('${p.id}')" title="Exportar">📄</button>
         <button class="btn-icon btn-delete" onclick="confirmDelete('${p.id}')" title="Excluir">🗑️</button>
       </div>
     </div>
@@ -840,31 +691,19 @@ function exportMD(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
 
-  const md = `# Product Input — ${p.name}
+  const md = `# Product Input — ${p.barcode}
 
-## 1. Código de Barras
-${p.barcode || 'Não informado'}
+## Código de Barras
+${p.barcode}
 
-## 2. Foto do Produto
-${p.photos.length} foto(s) anexada(s) ao cadastro.
+## Foto
+${p.photos ? p.photos.length : 0} foto(s) anexada(s).
 
-## 3. Dados Básicos
-**Tipo de peça:** ${p.type}
-**Faixa etária:** ${p.ageRange}
-**Gênero:** ${p.gender}
-**Cor(es) disponíveis:** ${p.colors.join(', ') || 'Não informado'}
-**Tamanhos disponíveis:** ${p.sizes.join(', ') || 'Não informado'}
-**Material/composição do tecido:** ${p.material || 'Não informado'}
-**Preço de venda (R$):** ${p.price}
+## Material
+${p.material || 'Não informado'}
 
-## 4. Dados de Catálogo
-**Marca:** ${p.brand}
-**Código SKU:** ${p.sku || 'Não informado'}
-**Categoria no Nuvemshop:** ${p.category || 'Não informado'}
-**É produto destaque?** ${p.featured ? 'Sim' : 'Não'}
-
-## 5. Observações
-${p.notes || 'Nenhuma observação.'}
+## Data
+${p.createdAt}
 `;
 
   const blob = new Blob([md], { type: 'text/markdown' });
